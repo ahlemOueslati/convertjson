@@ -1,0 +1,9 @@
+{
+	"name": "test-analytics-data-factory",
+	"location": "westeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "978d7c5c-533a-441c-b41b-57b17457cfec",
+		"tenantId": "3892d265-18b6-4e89-bc64-4be8473d591e"
+	}
+}

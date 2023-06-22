@@ -1,0 +1,191 @@
+{
+	"name": "Transformation with Azure Databricks",
+	"properties": {
+		"description": "Run a simple Transformation job using Azure Databricks, with a single pane of glass monitoring from ADF.\n\nIn the template, we check for source dataset availability. Once it is available we copy it into a blob storage for staging using a Copy activity. The same storage is accessed from Databricks clusters while processing the data (Transformation). The output is stored in the same storage under 'output' folder. Various notebook properties are referenced as expressions using pipeline parameters, which lets you configure more generic and reusable pipelines.",
+		"activities": [
+			{
+				"name": "Availability flag",
+				"description": "Validation activity is used to get information about the source files if they are available for processing. \nIn this template, only when the '_success' flag/ file is available at source, would the downstream activities be triggered. ",
+				"type": "Validation",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "JsonSource",
+						"type": "DatasetReference"
+					},
+					"timeout": "7.00:00:00",
+					"sleep": 10
+				}
+			},
+			{
+				"name": "Transformation",
+				"description": "Databricks Notebook activity does the processing of the data copied in the previous step (copy activity).  Please ensure you have added the databricks notebook (<a href='https://adflabstaging1.blob.core.windows.net/share/Transformations.html' target='_blank'>https://adflabstaging1.blob.core.windows.net/share/Transformations.html</a>) in the databricks work-space and referenced it in the notebook activity in ADF.",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Availability flag",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/ahlem.oueslati@keyrustunisie.onmicrosoft.com/ConvertJson",
+					"baseParameters": {
+						"pipelineRunId": {
+							"value": "@pipeline().RunId",
+							"type": "Expression"
+						},
+						"BlobAccountName": {
+							"value": "@pipeline().parameters.BlobAccountName",
+							"type": "Expression"
+						},
+						"InputContainerName": {
+							"value": "@pipeline().parameters.InputContainerName",
+							"type": "Expression"
+						},
+						"OutputContainerName": {
+							"value": "@pipeline().parameters.OutputContainerName",
+							"type": "Expression"
+						},
+						"AccessKey": {
+							"value": "@pipeline().parameters.AccessKey",
+							"type": "Expression"
+						},
+						"Token": {
+							"value": "@pipeline().parameters.Token",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Transform",
+				"type": "DatabricksSparkPython",
+				"dependsOn": [
+					{
+						"activity": "Availability flag",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pythonFile": "dbfs:/FileStore/tables/convertjson.py",
+					"parameters": [
+						"@pipeline().parameters.BlobAccountName",
+						"@pipeline().parameters.InputContainerName",
+						"@pipeline().parameters.OutputContainerName",
+						"@pipeline().parameters.AccessKey",
+						"@pipeline().parameters.Token"
+					]
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "ConvertJSON",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "Availability flag",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Repos/ahlem.oueslati@keyrustunisie.onmicrosoft.com/convertjson/convertjson.py",
+					"baseParameters": {
+						"AccessKey": {
+							"value": "@pipeline().parameters.AccessKey",
+							"type": "Expression"
+						},
+						"BlobAccountName": {
+							"value": "@pipeline().parameters.BlobAccountName",
+							"type": "Expression"
+						},
+						"InputContainerName": {
+							"value": "@pipeline().parameters.InputContainerName",
+							"type": "Expression"
+						},
+						"OutputContainerName": {
+							"value": "@pipeline().parameters.OutputContainerName",
+							"type": "Expression"
+						},
+						"Token": {
+							"value": "@pipeline().parameters.Token",
+							"type": "Expression"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"BlobAccountName": {
+				"type": "String",
+				"defaultValue": "adlsg2storagempn"
+			},
+			"InputContainerName": {
+				"type": "String",
+				"defaultValue": "obaanalyticsfiles"
+			},
+			"OutputContainerName": {
+				"type": "string",
+				"defaultValue": "jsonconverted"
+			},
+			"AccessKey": {
+				"type": "string",
+				"defaultValue": "nMBX/DpZHAt6YzvRb+iHQhCM2Flwmr5BhS/gK8iYMmDpBLLNduHlOKG5+0RgN0XTkGe+NTh4Jgk8+ASt/rPEmQ=="
+			},
+			"Token": {
+				"type": "string",
+				"defaultValue": "?sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2027-12-31T17:52:18Z&st=2023-06-19T09:52:18Z&spr=https&sig=%2BlKhi%2FxNtL1Y%2F%2BWLnFAyKT10HnQSu0EGoVBj2KnVPsI%3D"
+			}
+		},
+		"variables": {
+			"Token": {
+				"type": "String",
+				"defaultValue": "?sv=2022-11-02&ss=bfqt&srt=sco&sp=rwdlacupiytfx&se=2027-12-31T17:52:18Z&st=2023-06-19T09:52:18Z&spr=https&sig=%2BlKhi%2FxNtL1Y%2F%2BWLnFAyKT10HnQSu0EGoVBj2KnVPsI%3D"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2023-06-22T09:31:21Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,19 @@
+{
+	"name": "JsonSink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SinkBlob",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "jsonconverted"
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

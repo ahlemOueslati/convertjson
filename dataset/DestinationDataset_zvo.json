@@ -1,0 +1,16 @@
+{
+	"name": "DestinationDataset_zvo",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSynapseAnalytics1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [],
+		"typeProperties": {
+			"table": "text_mining"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

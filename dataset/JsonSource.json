@@ -1,0 +1,97 @@
+{
+	"name": "JsonSource",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SourceBlob",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"container": "obaanalyticsfiles"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"time": {
+					"type": "string"
+				},
+				"resourceId": {
+					"type": "string"
+				},
+				"ResourceGUID": {
+					"type": "string"
+				},
+				"Type": {
+					"type": "string"
+				},
+				"ClientBrowser": {
+					"type": "string"
+				},
+				"ClientCountryOrRegion": {
+					"type": "string"
+				},
+				"ClientIP": {
+					"type": "string"
+				},
+				"ClientOS": {
+					"type": "string"
+				},
+				"ClientType": {
+					"type": "string"
+				},
+				"IKey": {
+					"type": "string"
+				},
+				"_BilledSize": {
+					"type": "integer"
+				},
+				"SDKVersion": {
+					"type": "string"
+				},
+				"SyntheticSource": {
+					"type": "string"
+				},
+				"Properties": {
+					"type": "object",
+					"properties": {
+						"Container Id": {
+							"type": "string"
+						},
+						"Input": {
+							"type": "string"
+						},
+						"Models": {
+							"type": "string"
+						},
+						"Prediction": {
+							"type": "string"
+						},
+						"Request Id": {
+							"type": "string"
+						},
+						"Service Name": {
+							"type": "string"
+						},
+						"Workspace Name": {
+							"type": "string"
+						}
+					}
+				},
+				"Message": {
+					"type": "string"
+				},
+				"SeverityLevel": {
+					"type": "integer"
+				},
+				"ItemCount": {
+					"type": "integer"
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

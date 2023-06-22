@@ -1,0 +1,22 @@
+{
+	"name": "DestinationDataset_wyw",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSynapseAnalytics1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [
+			{
+				"name": "Text",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Reviews"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
